@@ -15,13 +15,18 @@ RUN echo 'root:MatKhauCuaBan123' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/Profile/NOTFOUND/g' /etc/pam.d/sshd
 
-# Mở cổng 22 nội bộ cho SSH
+# Tải và cài đặt tự động Cloudflare Tunnel (Không cần tên miền)
+RUN curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb \
+    && dpkg -i cloudflared.deb \
+    && rm cloudflared.deb
+
 EXPOSE 22
 
-# Tạo file start.sh chạy SSH ở chế độ foreground để giữ container luôn sống
-RUN echo '#!/bin/bash' > /start.sh
-RUN echo 'echo "=== Dang khoi dong SSH Server ==="' >> /start.sh
-RUN echo 'exec /usr/sbin/sshd -D' >> /start.sh
+# Khởi động SSH và mở đường hầm nhận link công khai miễn phí
+RUN echo '#!/bin/bash' > /start.sh \
+    && echo '/usr/sbin/sshd' >> /start.sh \
+    && echo 'echo "=== DANG KHOI TAO DUONG TRUYEN SSH ==="' >> /start.sh \
+    && echo 'cloudflared tunnel --url tcp://localhost:22' >> /start.sh
 
 RUN chmod +x /start.sh
 
