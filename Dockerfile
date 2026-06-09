@@ -14,8 +14,8 @@ RUN curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/r
     && dpkg -i cloudflared.deb \
     && rm cloudflared.deb
 
-RUN mkdir /var/run/sshd
-# Bạn có thể đổi 'MatKhauCuaBan123' thành mật khẩu riêng nếu muốn bảo mật hơn
+# ĐÃ SỬA LỖI: Thêm lệnh -p để không bị lỗi nếu thư mục đã tồn tại
+RUN mkdir -p /var/run/sshd
 RUN echo 'root:MatKhauCuaBan123' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/Profile/NOTFOUND/g' /etc/pam.d/sshd
